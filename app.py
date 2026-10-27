@@ -139,6 +139,7 @@ else:
     st.caption(f"Showing {start + 1}?{min(start + page_size, len(filtered))} of {len(filtered)} themes")
     st.dataframe(
         table_rows,
+        height=800,
         use_container_width=True,
         hide_index=True,
         column_order=["No.", "Name", "Category", "ThemeForest", "Live demo", "Mobile", "Description"],
