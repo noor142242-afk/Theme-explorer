@@ -80,7 +80,7 @@ with st.sidebar:
         demo_only = availability in {"With live demo", "With demo and mobile"}
         mobile_only = availability in {"With mobile link", "With demo and mobile"}
         sort = st.selectbox("Sort by", ["Name A?Z", "Name Z?A"])
-        page_size = st.selectbox("Rows per page", [12, 24, 48])
+        page_size = st.selectbox("Rows per page", [24, 48, 100])
     navigation = st.container()
     st.divider()
     if st.button("Refresh collection", use_container_width=True):
@@ -139,7 +139,7 @@ else:
     st.caption(f"Showing {start + 1}?{min(start + page_size, len(filtered))} of {len(filtered)} themes")
     st.dataframe(
         table_rows,
-        height=800,
+        height=min(800, 38 + 35 * len(table_rows)),
         use_container_width=True,
         hide_index=True,
         column_order=["No.", "Name", "Category", "ThemeForest", "Live demo", "Mobile", "Description"],
