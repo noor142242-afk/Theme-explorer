@@ -63,7 +63,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 with st.sidebar:
-    st.markdown("## ?? Care Themes")
+    st.markdown(f"## {len(themes)} Themes")
     st.caption("YOUR HEALTHCARE THEME LIBRARY")
     with st.expander("Collection overview", expanded=True):
         st.caption("Find your next healthcare website. Explore themes, descriptions and live demos.")
@@ -79,13 +79,11 @@ with st.sidebar:
         availability = st.selectbox("Link availability", ["All themes", "With live demo", "With mobile link", "With demo and mobile"])
         demo_only = availability in {"With live demo", "With demo and mobile"}
         mobile_only = availability in {"With mobile link", "With demo and mobile"}
-        sort = st.selectbox("Sort by", ["Name A?Z", "Name Z?A"])
-        page_size = st.selectbox("Rows per page", [24, 48, 100])
-    navigation = st.container()
+        sort = st.selectbox("Sort by", ["Name A-Z", "Name Z-A"])
     st.divider()
     if st.button("Refresh collection", use_container_width=True):
         st.rerun()
-    st.caption("Hospital & clinic themes ? ThemeForest")
+    st.caption("Hospital & clinic themes | ThemeForest")
 
 
 filtered = [t for t in themes
@@ -105,26 +103,34 @@ download.download_button("Download results · JSON", json.dumps(filtered, ensure
 if not filtered:
     st.info("No themes match these filters. Try another search or category.")
 else:
-    pages = (len(filtered) + page_size - 1) // page_size
-    filters = (category, query, demo_only, mobile_only, sort, page_size)
-    if st.session_state.get("table_filters") != filters:
-        st.session_state["table_page"] = 1
-        st.session_state["table_filters"] = filters
-    st.session_state["table_page"] = min(st.session_state.get("table_page", 1), pages)
+    table_slot = st.empty()
+    with st.container(border=True):
+        spacer, label, size_control, range_slot, back, forward = st.columns([4, 1.4, 1, 1.8, .6, .6], vertical_alignment="center")
+        label.write("Rows per page")
+        with size_control:
+            page_size = st.selectbox("Rows per page", [25, 50, 100],
+                                     key="rows_per_page", label_visibility="collapsed")
+        pages = (len(filtered) + page_size - 1) // page_size
+        filters = (category, query, demo_only, mobile_only, sort, page_size)
+        if st.session_state.get("table_filters") != filters:
+            st.session_state["table_page"] = 1
+            st.session_state["table_filters"] = filters
+        st.session_state["table_page"] = min(st.session_state.get("table_page", 1), pages)
 
-    def change_page(delta):
-        st.session_state["table_page"] += delta
+        def go_to_page(number):
+            st.session_state["table_page"] = number
 
-    previous, following = st.columns(2)
-    previous.button("Previous", disabled=st.session_state["table_page"] <= 1,
-                    on_click=change_page, args=(-1,), use_container_width=True)
-    with navigation:
-        st.caption("PAGINATION")
-        st.selectbox("Page", range(1, pages + 1), key="table_page",
-                     format_func=lambda n: f"Page {n} of {pages}")
-    following.button("Next", disabled=st.session_state["table_page"] >= pages,
-                     on_click=change_page, args=(1,), use_container_width=True)
-    page = st.session_state["table_page"]
+        page = st.session_state["table_page"]
+        range_slot.write(f"{(page - 1) * page_size + 1}-{min(page * page_size, len(filtered))} of {len(filtered)}")
+        back.button("\u2039", help="Previous page", disabled=page == 1,
+                    on_click=go_to_page, args=(page - 1,), use_container_width=True)
+        forward.button("\u203a", help="Next page", disabled=page == pages,
+                       on_click=go_to_page, args=(page + 1,), use_container_width=True)
+        numbers = st.columns([4] + [1] * pages)
+        for number in range(1, pages + 1):
+            numbers[number].button(str(number), key=f"page-number-{number}",
+                                   type="primary" if page == number else "secondary",
+                                   on_click=go_to_page, args=(number,), use_container_width=True)
     start = (page - 1) * page_size
     visible = filtered[start:start + page_size]
     table_rows = [{
@@ -136,8 +142,7 @@ else:
         "Live demo": theme.get("demo_link") if valid_link(theme.get("demo_link")) else None,
         "Mobile": theme.get("mobile_link") if valid_link(theme.get("mobile_link")) else None,
     } for index, theme in enumerate(visible)]
-    st.caption(f"Showing {start + 1}?{min(start + page_size, len(filtered))} of {len(filtered)} themes")
-    st.dataframe(
+    table_slot.dataframe(
         table_rows,
         height=min(800, 38 + 35 * len(table_rows)),
         use_container_width=True,
