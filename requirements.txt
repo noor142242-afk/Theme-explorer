@@ -1,0 +1,5 @@
+﻿beautifulsoup4>=4.12,<5
+selenium>=4.20,<5
+undetected-chromedriver>=3.5.5,<4
+setuptools>=70
+streamlit>=1.40,<2
