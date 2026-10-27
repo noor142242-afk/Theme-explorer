@@ -128,21 +128,23 @@ else:
     start = (page - 1) * page_size
     visible = filtered[start:start + page_size]
     table_rows = [{
+        "No.": start + index + 1,
         "Name": theme.get("name") or "Untitled theme",
         "Category": ", ".join(c.title() for c in theme["categories"]),
         "Description": (theme.get("description") or "Description unavailable.")[:180],
         "ThemeForest": theme.get("website_link") if valid_link(theme.get("website_link")) else None,
         "Live demo": theme.get("demo_link") if valid_link(theme.get("demo_link")) else None,
         "Mobile": theme.get("mobile_link") if valid_link(theme.get("mobile_link")) else None,
-    } for theme in visible]
+    } for index, theme in enumerate(visible)]
     st.caption(f"Showing {start + 1}?{min(start + page_size, len(filtered))} of {len(filtered)} themes")
     st.dataframe(
         table_rows,
         use_container_width=True,
         hide_index=True,
-        column_order=["Name", "Category", "ThemeForest", "Live demo", "Mobile", "Description"],
+        column_order=["No.", "Name", "Category", "ThemeForest", "Live demo", "Mobile", "Description"],
         key=f"table-{category}-{query}-{demo_only}-{mobile_only}-{sort}-{page_size}-{page}",
         column_config={
+            "No.": st.column_config.NumberColumn("No.", format="%d", width="small"),
             "Name": st.column_config.TextColumn("Theme name", width="large"),
             "Category": st.column_config.TextColumn(width="small"),
             "Description": st.column_config.TextColumn("Description preview", width="large"),
