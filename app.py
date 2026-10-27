@@ -59,6 +59,14 @@ st.markdown("""
 [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] {color: #e2e8f0;}
 [data-testid="stSidebar"] input {background: #171e29; color: #f1f5f9;}
 [data-testid="stSidebar"] button {background: #171e29; color: #f1f5f9; border-color: #303b4c;}
+.st-key-pagination {padding: 10px 14px !important; border-radius: 10px !important;}
+.st-key-pagination [data-testid="stButton"] button {
+    min-height: 32px !important; height: 32px !important; padding: 0 6px !important;
+    border-radius: 6px !important; font-size: 13px !important;}
+.st-key-pagination [data-testid="stButton"] button p {font-size: 13px !important;}
+.st-key-pagination button[kind="primary"] {background: #147d92; border-color: #147d92; color: white;}
+.st-key-pagination [data-baseweb="select"] > div {min-height: 34px; height: 34px; font-size: 13px;}
+.st-key-pagination [data-testid="stCaptionContainer"] p {margin: 0; white-space: nowrap; font-size: 13px;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -103,9 +111,9 @@ if not filtered:
     st.info("No themes match these filters. Try another search or category.")
 else:
     table_slot = st.empty()
-    with st.container(border=True):
-        spacer, label, size_control, range_slot, back, forward = st.columns([4, 1.4, 1, 1.8, .6, .6], vertical_alignment="center")
-        label.write("Rows per page")
+    with st.container(border=True, key="pagination"):
+        spacer, label, size_control, range_slot, navigation = st.columns([4, 1.5, 1, 1.8, 3.4], gap="small", vertical_alignment="center")
+        label.caption("Rows per page")
         with size_control:
             page_size = st.selectbox("Rows per page", [25, 50, 100],
                                      key="rows_per_page", label_visibility="collapsed")
@@ -120,16 +128,17 @@ else:
             st.session_state["table_page"] = number
 
         page = st.session_state["table_page"]
-        range_slot.write(f"{(page - 1) * page_size + 1}-{min(page * page_size, len(filtered))} of {len(filtered)}")
-        back.button("\u2039", help="Previous page", disabled=page == 1,
-                    on_click=go_to_page, args=(page - 1,), use_container_width=True)
-        forward.button("\u203a", help="Next page", disabled=page == pages,
-                       on_click=go_to_page, args=(page + 1,), use_container_width=True)
-        numbers = st.columns([4] + [1] * pages)
-        for number in range(1, pages + 1):
-            numbers[number].button(str(number), key=f"page-number-{number}",
-                                   type="primary" if page == number else "secondary",
-                                   on_click=go_to_page, args=(number,), use_container_width=True)
+        range_slot.caption(f"{(page - 1) * page_size + 1}-{min(page * page_size, len(filtered))} of {len(filtered)}")
+        with navigation:
+            controls = st.columns(pages + 2, gap="small", vertical_alignment="center")
+            controls[0].button("\u2039", help="Previous page", disabled=page == 1,
+                               on_click=go_to_page, args=(page - 1,), use_container_width=True)
+            for number in range(1, pages + 1):
+                controls[number].button(str(number), key=f"page-number-{number}",
+                                        type="primary" if page == number else "secondary",
+                                        on_click=go_to_page, args=(number,), use_container_width=True)
+            controls[-1].button("\u203a", help="Next page", disabled=page == pages,
+                                on_click=go_to_page, args=(page + 1,), use_container_width=True)
     start = (page - 1) * page_size
     visible = filtered[start:start + page_size]
     table_rows = [{
