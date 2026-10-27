@@ -65,7 +65,7 @@ st.markdown("""
 with st.sidebar:
     st.markdown(f"## {len(themes)} Themes")
     st.caption("YOUR HEALTHCARE THEME LIBRARY")
-    with st.expander("Collection overview", expanded=True):
+    with st.expander("Collection overview", expanded=False):
         st.caption("Find your next healthcare website. Explore themes, descriptions and live demos.")
         left, right = st.columns(2)
         left.metric("Unique themes", len(themes))
@@ -75,7 +75,7 @@ with st.sidebar:
     st.caption("BROWSE COLLECTION")
     query = st.text_input("Search themes", placeholder="Search name or technology...")
     category = st.selectbox("Category", ["All themes", "Hospital", "Clinic"])
-    with st.expander("Filter & display", expanded=True):
+    with st.expander("Filter & display", expanded=False):
         availability = st.selectbox("Link availability", ["All themes", "With live demo", "With mobile link", "With demo and mobile"])
         demo_only = availability in {"With live demo", "With demo and mobile"}
         mobile_only = availability in {"With mobile link", "With demo and mobile"}
