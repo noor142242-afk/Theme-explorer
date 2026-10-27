@@ -145,9 +145,9 @@ else:
         key=f"table-{category}-{query}-{demo_only}-{mobile_only}-{sort}-{page_size}-{page}",
         column_config={
             "No.": st.column_config.NumberColumn("No.", format="%d", width="small"),
-            "Name": st.column_config.TextColumn("Theme name", width="large"),
-            "Category": st.column_config.TextColumn(width="small"),
-            "Description": st.column_config.TextColumn("Description preview", width="large"),
+            "Name": st.column_config.TextColumn("Theme name", width=520),
+            "Category": st.column_config.TextColumn(width=160),
+            "Description": st.column_config.TextColumn("Description preview", width=650),
             "ThemeForest": st.column_config.LinkColumn(display_text="View theme"),
             "Live demo": st.column_config.LinkColumn(display_text="Open demo"),
             "Mobile": st.column_config.LinkColumn(display_text="Open mobile"),
