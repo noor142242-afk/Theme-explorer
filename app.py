@@ -95,7 +95,6 @@ filtered = [t for t in themes
 filtered.sort(key=lambda t: t.get("name", "").casefold(), reverse=sort == "Name Z–A")
 
 heading, download = st.columns([3, 1])
-heading.subheader(f"{len(filtered)} themes found")
 download.download_button("Download results · JSON", json.dumps(filtered, ensure_ascii=False, indent=2),
                          file_name="filtered_themes.json", mime="application/json",
                          use_container_width=True)
